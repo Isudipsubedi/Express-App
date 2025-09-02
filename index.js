@@ -1,5 +1,5 @@
 import express from 'express';
-import router from './route.js';
+
 
 const app = express()
 
@@ -9,32 +9,21 @@ app.get('/', (req, res) => {
     res.send('Hello Express')
 })
 
-app.use('/user',router)
-
-app.use(express.json())
-
-app.post('/users', (req, res)=>{
-    const {name, email} = req.body
-    res.json({
-        message:`User ${name} with email ${email} created successfully`
-    })
+app.get('/things/:name/:id', (req, res) => {
+   const { name, id } = req.params
+   if (!/^\d{5}$/.test(id)) {
+      return res.status(400).json({ error: 'ID must be exactly 5 digits' });
+   }
+   res.json({
+      id, name
+   })
 })
 
-app.put('/users/:id', (req, res)=> {
-    const userId = req.params.id
-    const {name, email} = req.body
-    res.json({
-        message: `User ${userId} updated to ${name}, ${email}`
-    })
+// catch all invalid routes
+app.get('/*any', (req, res)=>{
+   res.send('Sorry, this is an invalid route.')
 })
 
-app.delete('/users/:id', (req, res)=> {
-    const userId = req.params.id
-    res.json({
-        message: `User with ID ${userId} deleted successfully`
-    })
-
-})
 
 app.listen(PORT, ()=>{
     console.log(`Server is running on http://localhost:${PORT}`)
