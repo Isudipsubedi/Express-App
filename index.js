@@ -1,14 +1,7 @@
 import express from 'express';
 import multer from 'multer'
-
-//on sending post request from postman the file is saved to the uploads folder
-const storage = multer.diskStorage({
-    destination: 'uploads',
-    filename: (req, file, cb)=>{
-        cb(null, file.fieldname+'_'+Date.now()+file.originalname);
-    }
-})
-
+import { storage } from './config/multer.js'
+ 
 const app = express()
 const upload = multer({
     storage:storage,
