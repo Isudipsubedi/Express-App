@@ -1,33 +1,18 @@
 import express from 'express';
-import multer from 'multer'
-import { storage } from './config/multer.js'
+import mongoose from 'mongoose';
  
 const app = express()
-const upload = multer({
-    storage:storage,
-    limits:{
-        fileSize:102400
-    }
-
-})
 const PORT =3000
+const MONGODB_URI = 'mongodb+srv://sudip:sudip123@cluster0.bhw2xer.mongodb.net/express'
+//copied value + db name /express
 
-
-app.use(express.urlencoded({extended:true}))
-// app.use(upload.array())
-app.use(upload.single('image'))
+await mongoose.connect(MONGODB_URI).then(()=>{
+    console.log('Database Connected')
+})
 
 app.get('/', (req, res) => {
     res.send('Hello Express')
 })
-
-app.post('/form', (req, res)=>{
-    console.log(req.body)
-    console.log(req.file)
-    res.send('Form received')
-})
-
-
 
 app.listen(PORT, ()=>{
     console.log(`Server is running on http://localhost:${PORT}`)
