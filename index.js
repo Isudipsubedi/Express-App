@@ -5,17 +5,17 @@ const app = express()
 
 const PORT =3000
 
+//PUG
+// app.use(express.static('public'))
+// app.use(express.static('images'))
 
-//install package : npm i ejs 
-//ejs: embedded javascript
+//to expose this folder on virtual path
+app.use('/public', express.static('public'))
+app.use('/images', express.static('images'))
 
-//SET EJS as the view engine
 
-app.set('view engine', 'ejs')
 app.get('/', (req, res) => {
-   const userName = 'John Doe'
-   // index : view filename
-   res.render('index', {userName})
+    res.send('Hello Express')
 })
 
 
