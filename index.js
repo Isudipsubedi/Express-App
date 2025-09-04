@@ -1,11 +1,13 @@
 import express from 'express';
 import { connectDB } from './config/db.js';
 import { Person } from './models/Person.js';
- 
+
 const app = express()
-const PORT =3000
+const PORT = 3000
 
 await connectDB()
+
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.send('Hello Express')
@@ -13,18 +15,10 @@ app.get('/', (req, res) => {
 
 //Now we add some route, using which we will perform some CRUD operation
 
-app.post('/person', express.json(), async (req, res) => {
+//Saving data in MongoDB
+app.post('/person', async (req, res) => {
 
-//body : raw json in postman
-//     {
-//     "email":"test@eg.com",
-//     "name":"test",
-//     "age":"10"
-//     }
-
-// Now we will destructure this data from req.body object
-    const {email, name, age} = req.body
-//Store this data in the db
+    const { email, name, age } = req.body
     const newPerson = new Person({
         name,
         age,
@@ -35,10 +29,19 @@ app.post('/person', express.json(), async (req, res) => {
     res.send('Person added')
 })
 
-//now it is stored in the db cluster-> collection
+//New route for updating user data in the db
+app.put('/person', async (req, res) => {
+    const { name, age  } = req.body
 
+    //find method
+    //findOne, findById
+    const personData = await Person.find({name, age})
+    console.log(personData)
 
-app.listen(PORT, ()=>{
+    res.send('Person updated')
+})
+
+app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
-} )
+})
 
