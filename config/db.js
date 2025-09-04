@@ -1,8 +1,14 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
+// npm install dotenv
 import mongoose from "mongoose";
 
-export const connectDB = async () => {
-    const MONGODB_URI = 'mongodb+srv://sudip:sudip123@cluster0.bhw2xer.mongodb.net/express'
+// use env variables
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGODB_URI;
 
+export const connectDB = async () => {
     await mongoose.connect(MONGODB_URI).then(() => {
         console.log('Database Connected')
     })
