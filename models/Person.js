@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 //created a schema
-const personSchema = new mongoose.schema({
+const personSchema = new mongoose.Schema({
     name: String,
     age: Number,
     email: String,
@@ -12,4 +12,4 @@ const personSchema = new mongoose.schema({
 // const Person = mongoose.model("Person", personSchema)
 
 //we want to use this model in another file: export key word
-export const Person = mongoose.model("Person", personSchema)
+export const Person = mongoose.model("Person", personSchema);
