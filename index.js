@@ -17,28 +17,39 @@ app.get('/', (req, res) => {
 
 //Saving data in MongoDB
 app.post('/person', async (req, res) => {
+    try {
+        const { email, name, age } = req.body
+        const newPerson = new Person({
+            name,
+            age,
+            email
+        })
+        await newPerson.save()
+        console.log(newPerson)
+        res.send('Person Added')
+    } catch (error) {
+        res.send(error.message)
 
-    const { email, name, age } = req.body
-    const newPerson = new Person({
-        name,
-        age,
-        email
-    })
-    await newPerson.save()
-    console.log(newPerson)
-    res.send('Person added')
+    }
 })
 
 //New route for updating user data in the db
 app.put('/person', async (req, res) => {
-    const { name, age  } = req.body
+    const { id } = req.body
 
-    //find method
-    //findOne, findById
-    const personData = await Person.find({name, age})
+    const personData = await Person.findByIdAndUpdate(id, { age: '29' })
+
     console.log(personData)
 
     res.send('Person updated')
+})
+
+//Deleting data from MongoDB
+
+app.delete('/person/:id', async (req, res) => {
+    const { id } = req.params
+    await Person.findByIdAndDelete(id)
+    res.send('User Deleted')
 })
 
 app.listen(PORT, () => {
