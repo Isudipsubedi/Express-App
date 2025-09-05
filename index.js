@@ -1,60 +1,59 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
-import session from 'express-session'
+
+// install packages: npm install jsonwebtoken, npm install bcryptjs
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const app = express()
 const PORT = 3000
 
 app.use(express.json())
-app.use(cookieParser())
-app.use(session({
-    secret: 'sample-secret',
-    resave: false,
-    saveUninitialized: false
 
-}))
-
-const users = [ ]
+const users = []
 
 app.get('/', (req, res) => {
     res.send('Hello Express')
 })
 
-//When we hit this api, we get the users name pw and store them in an array
-app.post('/register', async(req, res)=>{
+app.post('/register', async (req, res) => {
     const { username, password } = req.body
-    //we will get username and password from the req.body 
-
+    const hashedPassword = await bcrypt.hash(password, 10)
     users.push({
         username,
-        password //we can also encrypt this password
+        password: hashedPassword
     })
-    //after getting this we store them in the db ie. array users[]
 
     res.send('user registered')
 
 })
 
-//login route
 
-app.post('/login', async(req, res)=>{
+app.post('/login', async (req, res) => {
     const { username, password } = req.body
 
-    // we will add verification
-    const user = users.find(u=> u.username === username)
-    if (!user || password !== user.password ) {
+    const user = users.find(u => u.username === username)
+    if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.send('Not authorized')
     }
-    req.session.user= user
-    res.send('user Logged in')
+    const token = jwt.sign({ username }, 'test#secret')
+    res.json({ token })
+
 
 })
 
-app.get('/dashboard', (req, res)=>{
-    if (!req.session.user){
-        return res.send('unauthorized')
+app.get('/dashboard', (req, res) => {
+    try {
+        const token = req.header('Authorization')
+        const decodedToken = jwt.verify(token, 'test#secret')
+        if (decodedToken.username) {
+            res.send(`Welcome, ${decodedToken.username}`)
+        }
+        else {
+            res.send('access denied')
+        }
+    } catch (error) {
+        res.send('access denied')
     }
-    res.send(`Welcome, ${req.session.user.username}`)
 })
 
 
