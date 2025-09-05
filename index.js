@@ -1,55 +1,23 @@
 import express from 'express';
-import { connectDB } from './config/db.js';
-import { Person } from './models/Person.js';
+import cookieParser from 'cookie-parser';
 
 const app = express()
 const PORT = 3000
-
-await connectDB()
-
-app.use(express.json())
+app.use(cookieParser())
 
 app.get('/', (req, res) => {
+    res.cookie('name','express-app', {maxAge: 360000})
     res.send('Hello Express')
 })
 
-//Now we add some route, using which we will perform some CRUD operation
-
-//Saving data in MongoDB
-app.post('/person', async (req, res) => {
-    try {
-        const { email, name, age } = req.body
-        const newPerson = new Person({
-            name,
-            age,
-            email
-        })
-        await newPerson.save()
-        console.log(newPerson)
-        res.send('Person Added')
-    } catch (error) {
-        res.send(error.message)
-
-    }
+app.get('/fetch',(req, res)=>{
+    console.log(req.cookies);
+    res.send('API Called')
 })
 
-//New route for updating user data in the db
-app.put('/person', async (req, res) => {
-    const { id } = req.body
-
-    const personData = await Person.findByIdAndUpdate(id, { age: '29' })
-
-    console.log(personData)
-
-    res.send('Person updated')
-})
-
-//Deleting data from MongoDB
-
-app.delete('/person/:id', async (req, res) => {
-    const { id } = req.params
-    await Person.findByIdAndDelete(id)
-    res.send('User Deleted')
+app.get('/remove-cookie', (req, res)=>{
+    res.clearCookie('name')
+    res.send('cookie cleared')
 })
 
 app.listen(PORT, () => {
