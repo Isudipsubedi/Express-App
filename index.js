@@ -4,8 +4,9 @@ import session from 'express-session'
 
 const app = express()
 const PORT = 3000
-app.use(cookieParser())
 
+app.use(express.json())
+app.use(cookieParser())
 app.use(session({
     secret: 'sample-secret',
     resave: false,
@@ -13,29 +14,49 @@ app.use(session({
 
 }))
 
+const users = [ ]
+
 app.get('/', (req, res) => {
     res.send('Hello Express')
 })
 
-// To use SESSION we need external package ie. express session.
-//npm i express-session
+//When we hit this api, we get the users name pw and store them in an array
+app.post('/register', async(req, res)=>{
+    const { username, password } = req.body
+    //we will get username and password from the req.body 
 
-app.get('/visit', (req, res)=>{
-    if (req.session.page_views) {
-        req.session.page_views++;
-        res.send(`You visited this page ${req.session.page_views} times`)
-    } else {
-        req.session.page_views = 1;
-        res.send("Welcome to this page for the first time!")
+    users.push({
+        username,
+        password //we can also encrypt this password
+    })
+    //after getting this we store them in the db ie. array users[]
+
+    res.send('user registered')
+
+})
+
+//login route
+
+app.post('/login', async(req, res)=>{
+    const { username, password } = req.body
+
+    // we will add verification
+    const user = users.find(u=> u.username === username)
+    if (!user || password !== user.password ) {
+        return res.send('Not authorized')
     }
+    req.session.user= user
+    res.send('user Logged in')
+
 })
 
-// How we can remove any session?
-
-app.get('/remove-visit', (req, res)=>{
-    req.session.destroy()
-    res.send('Session Removed')
+app.get('/dashboard', (req, res)=>{
+    if (!req.session.user){
+        return res.send('unauthorized')
+    }
+    res.send(`Welcome, ${req.session.user.username}`)
 })
+
 
 
 app.listen(PORT, () => {
