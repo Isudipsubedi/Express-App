@@ -49,3 +49,20 @@ app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
 })
 
+
+
+/*
+PROJECT SCAFOLDING:
+
+npmjs.com: express-generator
+
+npm install -g express-generator
+
+express express-app-generated
+
+--Folder created with name express-app-generated
+
+npm install
+
+npm start
+*/
